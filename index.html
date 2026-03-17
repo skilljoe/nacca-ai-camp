@@ -3,123 +3,345 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Startup Camp Builder</title>
+    <title>AI Startup Sprint: Founder OS</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&display=swap');
-        body { font-family: 'Space+Grotesk', sans-serif; background-color: #f8fafc; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
         .step-panel { display: none; }
         .step-panel.active { display: block; animation: slideIn 0.3s ease-out; }
-        @keyframes slideIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-        .chart-container { position: relative; width: 100%; max-width: 500px; margin: 0 auto; height: 350px; }
-        canvas#drawCanvas { cursor: crosshair; touch-action: none; background: white; width: 100%; height: 100%; }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .nav-btn.active { background-color: #2563eb; color: white; font-weight: bold; }
+        .loading-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        canvas#drawCanvas { touch-action: none; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
-    <nav class="w-full md:w-72 bg-slate-900 text-white flex flex-col p-6 shadow-2xl z-10">
+    <nav class="w-full md:w-64 bg-slate-900 text-white p-6 flex flex-col shadow-2xl h-screen sticky top-0">
         <div class="mb-10">
-            <h1 class="text-3xl font-bold tracking-tighter text-blue-400">STARTUP<span class="text-white">OS</span></h1>
-            <p class="text-xs text-slate-400 uppercase tracking-widest mt-1">AI Camp Edition</p>
+            <h1 class="text-2xl font-black text-blue-400">FOUNDER<span class="text-white">OS</span></h1>
+            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest mt-1">Startup Simulator v2.5</p>
         </div>
+        
         <div class="flex-1 space-y-2" id="nav-links">
-            <button onclick="showStep(1)" class="nav-btn w-full text-left p-4 rounded-xl active transition-all flex items-center gap-3" id="btn-1">01 The Squad</button>
-            <button onclick="showStep(2)" class="nav-btn w-full text-left p-4 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-3" id="btn-2">02 The Big Idea</button>
-            <button onclick="showStep(3)" class="nav-btn w-full text-left p-4 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-3" id="btn-3">03 Design Lab</button>
-            <button onclick="showStep(4)" class="nav-btn w-full text-left p-4 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-3" id="btn-4">04 Tech Check</button>
-            <button onclick="showStep(5)" class="nav-btn w-full text-left p-4 rounded-xl hover:bg-slate-800 transition-all flex items-center gap-3" id="btn-5">05 Final Pitch</button>
+            <button onclick="showStep(1)" class="nav-btn w-full text-left p-4 rounded-xl active transition-all flex items-center gap-3" id="btn-1">
+                <span class="opacity-50 text-xs">01</span> The Squad
+            </button>
+            <button onclick="showStep(2)" class="nav-btn w-full text-left p-4 rounded-xl transition-all flex items-center gap-3" id="btn-2">
+                <span class="opacity-50 text-xs">02</span> The Big Idea
+            </button>
+            <button onclick="showStep(3)" class="nav-btn w-full text-left p-4 rounded-xl transition-all flex items-center gap-3" id="btn-3">
+                <span class="opacity-50 text-xs">03</span> Design Lab
+            </button>
+            <button onclick="showStep(4)" class="nav-btn w-full text-left p-4 rounded-xl transition-all flex items-center gap-3" id="btn-4">
+                <span class="opacity-50 text-xs">04</span> Tech Check
+            </button>
+            <button onclick="showStep(5)" class="nav-btn w-full text-left p-4 rounded-xl transition-all flex items-center gap-3" id="btn-5">
+                <span class="opacity-50 text-xs">05</span> Final Pitch
+            </button>
+        </div>
+
+        <div class="mt-auto p-4 bg-slate-800 rounded-xl border border-slate-700">
+            <div class="flex items-center gap-2 mb-2">
+                <div id="api-indicator" class="w-2 h-2 rounded-full bg-amber-500"></div>
+                <span id="api-text" class="text-[10px] font-bold uppercase text-slate-400">Logic Engine Mode</span>
+            </div>
+            <p class="text-[9px] text-slate-500 leading-tight">Paste Gemini API Key in code to unlock Super-AI Mode.</p>
         </div>
     </nav>
 
-    <main class="flex-1 overflow-y-auto p-6 md:p-12 bg-slate-50">
+    <main class="flex-1 overflow-y-auto p-6 md:p-12">
+        
         <section id="step-1" class="step-panel active max-w-4xl mx-auto">
-            <h2 class="text-5xl font-extrabold text-slate-900 mb-4">The Squad</h2>
+            <h2 class="text-5xl font-extrabold text-slate-900 mb-6">The Squad</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <input type="text" id="companyName" class="w-full text-2xl font-bold bg-white border-2 border-slate-200 rounded-2xl p-4" placeholder="Company Name">
-                <input type="text" id="mission" class="w-full text-lg bg-white border-2 border-slate-200 rounded-2xl p-5" placeholder="The Mission">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">Startup Name</label>
+                    <input type="text" id="companyName" class="w-full text-2xl font-bold bg-white border-2 border-slate-200 rounded-2xl p-4 focus:border-blue-500 outline-none" placeholder="e.g. BrainyBot AI">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-400 uppercase tracking-widest">The Mission</label>
+                    <input type="text" id="mission" class="w-full text-lg bg-white border-2 border-slate-200 rounded-2xl p-5 focus:border-blue-500 outline-none" placeholder="To help kids learn...">
+                </div>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input type="text" id="ceo-name" class="p-4 bg-white border rounded-xl" placeholder="CEO Name">
-                <input type="text" id="eng-name" class="p-4 bg-white border rounded-xl" placeholder="Engineer Name">
-                <input type="text" id="des-name" class="p-4 bg-white border rounded-xl" placeholder="Designer Name">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-3xl">👑</span>
+                    <h4 class="font-bold mt-2 text-sm uppercase">CEO</h4>
+                    <input type="text" id="ceo-name" class="mt-2 w-full bg-slate-50 border border-slate-100 rounded-lg p-2 text-sm" placeholder="Leader Name">
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-3xl">⚡</span>
+                    <h4 class="font-bold mt-2 text-sm uppercase">Engineer</h4>
+                    <input type="text" id="eng-name" class="mt-2 w-full bg-slate-50 border border-slate-100 rounded-lg p-2 text-sm" placeholder="Builder Name">
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+                    <span class="text-3xl">🎨</span>
+                    <h4 class="font-bold mt-2 text-sm uppercase">Designer</h4>
+                    <input type="text" id="des-name" class="mt-2 w-full bg-slate-50 border border-slate-100 rounded-lg p-2 text-sm" placeholder="Artist Name">
+                </div>
             </div>
-            <button onclick="showStep(2)" class="mt-8 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold">Next ➔</button>
+            
+            <button onclick="showStep(2)" class="mt-12 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold shadow-lg">Next: The Idea ➔</button>
         </section>
 
         <section id="step-2" class="step-panel max-w-4xl mx-auto">
             <h2 class="text-5xl font-extrabold text-slate-900 mb-6">The Big Idea</h2>
-            <textarea id="problemText" rows="3" class="w-full p-4 border rounded-xl mb-4" placeholder="What is the problem?"></textarea>
-            <textarea id="solutionText" rows="3" class="w-full p-4 border rounded-xl" placeholder="How does AI fix it?"></textarea>
-            <button onclick="showStep(3)" class="mt-8 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold">Next ➔</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="p-8 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-red-500 mb-4 flex items-center gap-2"><span>❓</span> The Problem</h3>
+                        <textarea id="problemText" rows="4" class="w-full bg-slate-50 rounded-xl p-4 border-0 focus:ring-2 focus:ring-red-400 outline-none" placeholder="What is annoying?"></textarea>
+                    </div>
+                    <div class="p-8 bg-white rounded-3xl border border-slate-200 shadow-sm">
+                        <h3 class="text-xl font-bold text-green-500 mb-4 flex items-center gap-2"><span>✨</span> The Solution</h3>
+                        <textarea id="solutionText" rows="4" class="w-full bg-slate-50 rounded-xl p-4 border-0 focus:ring-2 focus:ring-green-400 outline-none" placeholder="How does AI fix it?"></textarea>
+                    </div>
+                </div>
+                <div class="bg-amber-100 p-8 rounded-3xl border-2 border-amber-200 flex flex-col items-center justify-center text-center">
+                    <span class="text-5xl mb-4">🎲</span>
+                    <h3 class="text-2xl font-bold text-amber-900 mb-2">Need a Spark?</h3>
+                    <p id="ideaDisplay" class="text-amber-800 font-medium mb-8">Click to generate an idea!</p>
+                    <button onclick="generateIdea()" class="bg-amber-500 hover:bg-amber-600 text-white font-black px-8 py-4 rounded-2xl shadow-lg transition-transform active:scale-95">Spin Idea</button>
+                </div>
+            </div>
+            <button onclick="showStep(3)" class="mt-12 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold shadow-lg">Next: Design Lab ➔</button>
         </section>
 
         <section id="step-3" class="step-panel max-w-4xl mx-auto">
-            <h2 class="text-5xl font-extrabold text-slate-900 mb-6">Design Lab</h2>
-            <div class="bg-white p-6 rounded-2xl shadow-xl">
-                <div class="flex gap-4 mb-4">
-                    <input type="color" id="penColor" value="#2563eb">
-                    <button onclick="clearCanvas()" class="text-red-500 font-bold">Clear</button>
+            <h2 class="text-5xl font-extrabold text-slate-900 mb-6 text-center">Design Lab</h2>
+            <div class="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-100">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="flex items-center gap-4 bg-slate-100 p-2 rounded-xl">
+                        <input type="color" id="penColor" class="w-8 h-8 rounded-lg cursor-pointer border-0" value="#2563eb">
+                        <input type="range" id="penSize" min="1" max="25" value="8" class="w-32 accent-blue-600">
+                    </div>
+                    <button onclick="clearCanvas()" class="text-xs font-bold text-red-500 uppercase">Clear Sketch</button>
                 </div>
-                <div style="height: 400px; border: 2px dashed #ccc;">
-                    <canvas id="drawCanvas"></canvas>
+                <div class="bg-slate-50 border-4 border-dashed border-slate-200 rounded-2xl overflow-hidden" style="height: 400px; position: relative;">
+                    <canvas id="drawCanvas" class="cursor-crosshair"></canvas>
                 </div>
             </div>
-            <button onclick="showStep(4)" class="mt-8 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold">Next ➔</button>
+            <button onclick="showStep(4)" class="mt-12 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold shadow-lg">Next: Tech Check ➔</button>
         </section>
 
         <section id="step-4" class="step-panel max-w-4xl mx-auto">
             <h2 class="text-5xl font-extrabold text-slate-900 mb-10">Tech Check</h2>
-            <textarea id="dataText" class="w-full p-4 border rounded-xl mb-4" placeholder="Training Data..."></textarea>
-            <textarea id="safetyText" class="w-full p-4 border rounded-xl" placeholder="Safety Rule..."></textarea>
-            <button onclick="launchPitch()" class="mt-8 bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold">Launch 🚀</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-slate-900 text-white p-10 rounded-3xl shadow-xl">
+                    <h3 class="text-2xl font-bold mb-6 text-blue-400"><span>📊</span> Training Data</h3>
+                    <p class="text-slate-400 mb-6 text-sm">What data will your AI learn from?</p>
+                    <textarea id="dataText" class="w-full bg-slate-800 rounded-2xl p-4 border border-slate-700 text-white outline-none focus:border-blue-500" rows="4" placeholder="e.g. 5,000 pictures of math problems..."></textarea>
+                </div>
+                <div class="bg-white p-10 rounded-3xl shadow-xl border border-slate-100">
+                    <h3 class="text-2xl font-bold mb-6 text-orange-600"><span>🛡️</span> Safety Rule</h3>
+                    <p class="text-slate-500 mb-6 text-sm">What is the "Golden Rule" your AI must follow?</p>
+                    <textarea id="safetyText" class="w-full bg-slate-50 rounded-2xl p-4 border border-slate-200 text-slate-800 outline-none focus:border-orange-500" rows="4" placeholder="e.g. Never use mean words..."></textarea>
+                </div>
+            </div>
+            <div class="mt-12 text-center">
+                <button onclick="generateFinal()" class="bg-blue-600 hover:bg-blue-700 text-white text-3xl font-black px-16 py-8 rounded-full shadow-2xl transition-transform hover:scale-105 active:scale-95">Launch Startup 🚀</button>
+            </div>
         </section>
 
         <section id="step-5" class="step-panel max-w-5xl mx-auto">
-            <h2 class="text-6xl font-black text-slate-900 mb-8">The Pitch</h2>
-            <div id="pitchResult" class="bg-white p-12 rounded-3xl shadow-2xl text-2xl italic"></div>
-            <button onclick="window.print()" class="mt-8 bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold">Print Pitch Deck</button>
+            <div id="loader" class="hidden text-center py-20">
+                <div class="text-6xl mb-4 animate-bounce">🤖</div>
+                <h2 class="text-3xl font-bold loading-pulse" id="loading-status">Analyzing your data...</h2>
+                <p class="text-slate-500 mt-2">Connecting to AI Brain Engine</p>
+            </div>
+
+            <div id="pitch-area" class="hidden space-y-12">
+                <div class="text-center">
+                    <h2 class="text-7xl font-black text-slate-900 mb-2" id="res-name">Startup Name</h2>
+                    <p class="text-2xl text-slate-500 italic" id="res-mission"></p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="bg-white p-12 rounded-[3.5rem] shadow-2xl border-t-[16px] border-blue-600 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 p-8 text-[8px] font-bold text-slate-200 uppercase tracking-widest">Confidential Pitch Deck</div>
+                            <div id="res-pitch" class="text-3xl leading-relaxed font-medium text-slate-800 italic"></div>
+                        </div>
+
+                        <div class="bg-slate-900 text-white p-10 rounded-[2.5rem] shadow-xl">
+                            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-6 italic">Investor Feedback (AI Critique)</h4>
+                            <div id="res-critique" class="text-lg opacity-80 leading-relaxed space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100">
+                            <h4 class="text-center font-bold text-slate-800 mb-6 uppercase text-[10px] tracking-widest">Market Readiness</h4>
+                            <div class="chart-container">
+                                <canvas id="scoreChart"></canvas>
+                            </div>
+                        </div>
+                        <button onclick="window.print()" class="w-full bg-slate-900 text-white py-6 rounded-2xl font-bold shadow-lg hover:bg-black transition-colors">Print Deck</button>
+                        <button onclick="showStep(1)" class="w-full text-slate-400 font-bold text-sm">Start Over</button>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
     <script>
-        const panels = document.querySelectorAll('.step-panel');
+        // --- 🔑 OPTIONAL: PASTE YOUR GEMINI API KEY BELOW ---
+        const GEMINI_API_KEY = ""; 
+        // ---------------------------------------------------
+
+        let chartInstance = null;
+        let canvas, ctx, drawing = false;
+
+        window.onload = () => {
+            const apiText = document.getElementById('api-text');
+            const apiInd = document.getElementById('api-indicator');
+            if(GEMINI_API_KEY) {
+                apiText.innerText = "Super-AI Mode (Live)";
+                apiInd.className = "w-2 h-2 rounded-full bg-green-500 animate-pulse";
+            }
+        };
+
         function showStep(n) {
-            panels.forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active', 'bg-blue-600', 'font-bold'));
             document.getElementById(`step-${n}`).classList.add('active');
-            if(n === 3) initCanvas();
+            document.getElementById(`btn-${n}`).classList.add('active', 'bg-blue-600', 'font-bold');
+            if(n === 3) setTimeout(initCanvas, 100);
+            window.scrollTo(0,0);
         }
 
-        let canvas, ctx, drawing = false;
+        // --- Logic Engine (The Offline "AI") ---
+        const offlineCritiques = [
+            "Your product solves a clear pain point! Investors love solutions that fix real-world frustrations.",
+            "Great focus on safety. Building ethical AI is a huge competitive advantage in 2026.",
+            "Brilliant branding! The mission statement is catchy and would work well for your target audience.",
+            "The training data you identified is key. Make sure your hardware can handle that much information!",
+            "Excellent team roles. Having a strong CEO and Engineer duo is the secret to most unicorns."
+        ];
+
+        function generateIdea() {
+            const ideas = [
+                "🤖 Homework Buddy: Explains math in a funny pirate voice.",
+                "♻️ Smart Bin: Tells you exactly what can be recycled using a camera.",
+                "🐶 Doggy-Talk: Translates barks into text messages.",
+                "🏀 CoachAI: Watches your jump shot and gives you pro tips.",
+                "👕 StylistBot: Picks your outfit based on the weather in Toronto."
+            ];
+            document.getElementById('ideaDisplay').innerText = ideas[Math.floor(Math.random() * ideas.length)];
+        }
+
+        async function generateFinal() {
+            const name = document.getElementById('companyName').value || "Our Tech Startup";
+            const problem = document.getElementById('problemText').value || "a big problem";
+            const solution = document.getElementById('solutionText').value || "smart AI";
+            const mission = document.getElementById('mission').value || "to make the world better";
+            const safety = document.getElementById('safetyText').value || "be responsible";
+
+            showStep(5);
+            document.getElementById('loader').classList.remove('hidden');
+            document.getElementById('pitch-area').classList.add('hidden');
+
+            await new Promise(r => setTimeout(r, 2000)); // Artificial "thinking" time
+
+            let pitchText = `Hello Investors! We are ${name}. We noticed that ${problem} is a major issue. Our AI fixes this by ${solution}. We promise to always follow our Golden Rule: ${safety}. We are ready to change the future!`;
+            let critique = offlineCritiques[Math.floor(Math.random() * offlineCritiques.length)];
+
+            // IF API KEY IS PRESENT, OVERWRITE WITH REAL AI
+            if(GEMINI_API_KEY) {
+                document.getElementById('loading-status').innerText = "Connecting to Gemini 1.5 Flash...";
+                try {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ contents: [{ parts: [{ text: `Act as a startup coach. Write a powerful 3-sentence investor pitch for: Name: ${name}, Problem: ${problem}, Solution: ${solution}. Then provide 2 brief feedback points starting with CRITIQUE:.` }] }] })
+                    });
+                    const result = await response.json();
+                    const fullText = result.candidates[0].content.parts[0].text;
+                    const parts = fullText.split('CRITIQUE:');
+                    pitchText = parts[0].trim();
+                    critique = parts[1] || "Great vision!";
+                } catch(e) {
+                    console.error("API Error, falling back to Logic Engine.");
+                }
+            }
+
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('pitch-area').classList.remove('hidden');
+
+            document.getElementById('res-name').innerText = name;
+            document.getElementById('res-mission').innerText = mission;
+            document.getElementById('res-pitch').innerText = pitchText;
+            document.getElementById('res-critique').innerText = critique;
+
+            updateScoreChart();
+        }
+
         function initCanvas() {
             canvas = document.getElementById('drawCanvas');
             ctx = canvas.getContext('2d');
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-            ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = 5;
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            ctx.lineJoin = 'round'; ctx.lineCap = 'round';
             
             const getPos = (e) => {
                 const r = canvas.getBoundingClientRect();
                 const ev = e.touches ? e.touches[0] : e;
                 return { x: ev.clientX - r.left, y: ev.clientY - r.top };
             };
-            canvas.onmousedown = (e) => { drawing = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); };
-            canvas.onmousemove = (e) => { if(!drawing) return; const p = getPos(e); ctx.strokeStyle = document.getElementById('penColor').value; ctx.lineTo(p.x, p.y); ctx.stroke(); };
-            window.onmouseup = () => { drawing = false; };
-        }
-        function clearCanvas() { ctx.clearRect(0,0,canvas.width, canvas.height); }
 
-        function launchPitch() {
-            const company = document.getElementById('companyName').value || "Our Startup";
-            const prob = document.getElementById('problemText').value || "a big problem";
-            const sol = document.getElementById('solutionText').value || "AI tech";
-            const safe = document.getElementById('safetyText').value || "be safe";
-            document.getElementById('pitchResult').innerHTML = `
-                "Hello! We are <b>${company}</b>. We saw that <b>${prob}</b> is a problem. 
-                Our AI solves it by <b>${sol}</b>. Our golden rule is: <b>${safe}</b>."
-            `;
-            showStep(5);
+            canvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); };
+            canvas.onmousemove = (e) => {
+                if(!drawing) return;
+                const p = getPos(e);
+                ctx.strokeStyle = document.getElementById('penColor').value;
+                ctx.lineWidth = document.getElementById('penSize').value;
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                e.preventDefault();
+            };
+            window.onmouseup = () => drawing = false;
+
+            // Touch Support
+            canvas.ontouchstart = (e) => { drawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y); e.preventDefault(); };
+            canvas.ontouchmove = (e) => {
+                if(!drawing) return;
+                const p = getPos(e);
+                ctx.strokeStyle = document.getElementById('penColor').value;
+                ctx.lineWidth = document.getElementById('penSize').value;
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                e.preventDefault();
+            };
+            canvas.ontouchend = () => drawing = false;
+        }
+        function clearCanvas() { if(ctx) ctx.clearRect(0,0,canvas.width, canvas.height); }
+
+        function updateScoreChart() {
+            const ctxChart = document.getElementById('scoreChart').getContext('2d');
+            if(chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctxChart, {
+                type: 'radar',
+                data: {
+                    labels: ['Branding', 'Problem', 'Solution', 'Tech', 'Safety'],
+                    datasets: [{
+                        data: [Math.random()*30+70, Math.random()*30+70, Math.random()*30+70, Math.random()*30+70, 100],
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: '#2563eb',
+                        borderWidth: 2
+                    }]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { min: 0, max: 100, ticks: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
         }
     </script>
 </body>
