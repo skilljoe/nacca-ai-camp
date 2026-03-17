@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dress 4 Le$$ | AI Stylist</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Space+Grotesk:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; background-color: #020617; color: #f8fafc; }
+        .pink-cursive { font-family: 'Dancing Script', cursive; color: #ec4899; }
+        .green-money { color: #22c55e; font-weight: 800; letter-spacing: -2px; }
+        .electric-blue { color: #2563eb; }
+        .glass-card { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(51, 65, 85, 0.5); }
+        .input-dark { background: #0f172a; border: 1px solid #334155; border-radius: 0.75rem; color: white; outline: none; transition: 0.3s; }
+        .input-dark:focus { border-color: #2563eb; box-shadow: 0 0 10px rgba(37, 99, 235, 0.3); }
+        .loading-pulse { animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col md:flex-row">
+    <nav class="w-full md:w-96 glass-card p-8 flex flex-col h-screen sticky top-0 z-50 overflow-y-auto">
+        <div class="mb-10 text-center">
+            <h1 class="text-5xl font-black tracking-tighter">
+                <span class="pink-cursive">Dress</span> <span class="green-money">4 Le$$</span>
+            </h1>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-slate-500 mt-2">Personal AI Stylist</p>
+        </div>
+        <div class="space-y-6 flex-1">
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Occasion</label>
+                <select id="occasion" class="w-full p-4 input-dark text-sm">
+                    <option value="Job Interview">Job Interview</option>
+                    <option value="Wedding">Wedding</option>
+                    <option value="Gala">Gala Event</option>
+                    <option value="Streetwear">Casual Streetwear</option>
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Body Type</label>
+                <select id="bodyType" class="w-full p-4 input-dark text-sm">
+                    <option value="Athletic">Athletic</option>
+                    <option value="Curvy">Curvy</option>
+                    <option value="Slim">Slim</option>
+                    <option value="Tall/Plus">Tall / Plus</option>
+                </select>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Budget Range</label>
+                <select id="budget" class="w-full p-4 input-dark text-sm">
+                    <option value="Under $50">Under $50</option>
+                    <option value="$100-$200">$100 - $200</option>
+                    <option value="$500+">Luxury ($500+)</option>
+                </select>
+            </div>
+        </div>
+        <button onclick="generateLook()" class="mt-8 bg-blue-600 hover:bg-blue-500 text-white py-5 rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95">
+            Curate My Look ✨
+        </button>
+    </nav>
+    <main class="flex-1 p-6 md:p-12">
+        <div id="welcome-msg" class="h-full flex flex-col items-center justify-center text-center space-y-4">
+            <div class="text-6xl">👗</div>
+            <h2 class="text-3xl font-bold opacity-20">Set your style to begin...</h2>
+        </div>
+        <div id="loader" class="hidden h-full flex flex-col items-center justify-center text-center space-y-6">
+            <div class="w-20 h-20 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            <h2 class="text-2xl font-bold loading-pulse italic">Scanning the runways...</h2>
+        </div>
+        <div id="result-area" class="hidden max-w-5xl mx-auto space-y-10">
+            <div class="text-center mb-10">
+                <h2 class="text-6xl font-black uppercase tracking-tighter" id="outfit-title">Your Look</h2>
+                <div class="inline-block mt-4 px-4 py-1 rounded-full bg-pink-500/10 text-pink-500 text-xs font-bold uppercase tracking-widest" id="outfit-tag">Stylist Pick</div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="glass-card rounded-[2.5rem] p-10 relative overflow-hidden">
+                    <h3 class="text-2xl font-bold mb-8 flex items-center gap-3"><span class="electric-blue">●</span> Visual Outfit Card</h3>
+                    <div class="space-y-6" id="outfit-items"></div>
+                </div>
+                <div class="space-y-8">
+                    <div class="bg-white text-slate-900 rounded-[2.5rem] p-10 shadow-2xl">
+                        <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><span class="text-green-500">💰</span> Savings Analysis</h3>
+                        <div class="space-y-4" id="price-comparison"></div>
+                        <div class="mt-8 pt-6 border-t border-slate-100 flex justify-between items-center">
+                            <span class="text-sm font-bold text-slate-400 uppercase">Potential Savings</span>
+                            <span class="text-3xl font-black text-green-600" id="total-savings">-$0.00</span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-600 p-8 rounded-[2rem] text-white shadow-xl italic font-medium" id="ai-tip"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        const GEMINI_API_KEY = ""; 
+        const fallbackLooks = {
+            "Job Interview": { items: ["Blazer", "Trousers", "Loafers", "Watch"], designer: [400, 250, 200, 100], budget: [75, 50, 40, 20], tip: "Neutral tones command respect. Ensure your blazer is steamed for a sharp first impression." },
+            "Wedding": { items: ["Midi Dress", "Stiletto", "Clutch", "Earrings"], designer: [700, 500, 300, 150], budget: [110, 80, 35, 25], tip: "A-line silhouettes are timeless. Add a pop of color with your clutch for a modern twist." },
+            "Streetwear": { items: ["Hoodie", "Cargoes", "Sneakers", "Beanie"], designer: [300, 350, 500, 80], budget: [40, 55, 100, 12], tip: "Layering is key for streetwear. Don't be afraid to mix textures like tech-fleece and cotton." },
+            "Gala Event": { items: ["Velvet Suit", "Oxford Shoes", "Bowtie", "Cufflinks"], designer: [1200, 600, 150, 200], budget: [180, 95, 25, 30], tip: "Fit is everything. A tailored budget suit will always look more expensive than a loose designer one." }
+        };
+        async function generateLook() {
+            const occ = document.getElementById('occasion').value;
+            document.getElementById('welcome-msg').classList.add('hidden');
+            document.getElementById('result-area').classList.add('hidden');
+            document.getElementById('loader').classList.remove('hidden');
+            await new Promise(r => setTimeout(r, 1500));
+            let look = fallbackLooks[occ] || fallbackLooks["Streetwear"];
+            let itemsHtml = ""; let priceHtml = ""; let total = 0;
+            look.items.forEach((item, i) => {
+                total += (look.designer[i] - look.budget[i]);
+                itemsHtml += `<div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700 font-bold">${item}</div>`;
+                priceHtml += `<div class="flex justify-between items-center"><span class="text-slate-500 font-medium">${item}</span><div class="text-right"><div class="text-[10px] line-through text-slate-400">$${look.designer[i]}</div><div class="font-bold text-green-600">$${look.budget[i]}</div></div></div>`;
+            });
+            document.getElementById('outfit-title').innerText = occ;
+            document.getElementById('outfit-items').innerHTML = itemsHtml;
+            document.getElementById('price-comparison').innerHTML = priceHtml;
+            document.getElementById('total-savings').innerText = `-$${total.toFixed(2)}`;
+            document.getElementById('ai-tip').innerText = `"${look.tip}"`;
+            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('result-area').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
